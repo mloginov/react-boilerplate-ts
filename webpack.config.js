@@ -3,14 +3,14 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
-    app: ['./src/app.ts'],
+    app: ['./src/app.tsx'],
     vendor: ['react', 'react-dom'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'js/[name].bundle.js',
   },
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
@@ -18,8 +18,9 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader',
-      },
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      }
     ],
   },
 

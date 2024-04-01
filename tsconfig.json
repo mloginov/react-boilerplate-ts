@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5", // Specify ECMAScript target version
+    "target": "esnext", // Specify ECMAScript target version
+    "outDir": "./dist/",
     "lib": [
       "dom",
       "dom.iterable",
@@ -16,7 +17,6 @@
     "moduleResolution": "node", // Resolve modules using Node.js style
     "isolatedModules": true, // Unconditionally emit imports for unresolved files
     "resolveJsonModule": true, // Include modules imported with .json extension
-    "noEmit": true, // Do not emit output (meaning do not compile code, only perform type checking)
     "jsx": "react", // Support JSX in .tsx files
     "sourceMap": true, // Generate corresponding .map file
     "declaration": true, // Generate corresponding .d.ts file

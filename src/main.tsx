@@ -10,7 +10,7 @@ export class Main extends React.Component<IMainProps, {}> {
     super(props);
   }
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     return <>Main app</>;
   }
 }
