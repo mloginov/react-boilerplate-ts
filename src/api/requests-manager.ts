@@ -6,7 +6,7 @@ const types = [
   'university',
   'bootcamps',
   'profTraining',
-  'school',
+  'k12',
   'enterprise',
 ];
 
@@ -23,6 +23,6 @@ const requestFixture = (): IRequest => ({
 });
 
 export const fetchRequests = async (): Promise<IRequest[]> => {
-  await stall();
+  await stall(1000);
   return [...new Array(15)].map(requestFixture);
 };

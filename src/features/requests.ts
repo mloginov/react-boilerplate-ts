@@ -1,4 +1,4 @@
-import * as requestsManager from '../../api/requests-manager'
+import * as requestsManager from '../api/requests-manager'
 import {useQuery} from "@tanstack/react-query";
 
 const requestsKeys = {

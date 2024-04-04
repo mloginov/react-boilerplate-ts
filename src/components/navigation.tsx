@@ -15,20 +15,15 @@ import Badge from '@mui/material/Badge';
 
 import PeopleIcon from '@mui/icons-material/People';
 import BusinessIcon from '@mui/icons-material/Business';
-import SchoolIcon from '@mui/icons-material/School';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MonetizationOn from '@mui/icons-material/MonetizationOn';
+import Lightbulb from '@mui/icons-material/Lightbulb';
 
 import { AuthContext } from './auth/auth-context';
-import {useAllRequests} from "../features/requests/queries";
+import {useAllRequests} from "../features/requests";
 
-// interface IRequest {
-//   id: string,
-//   name: string,
-//   type: string
-// }
 interface IRequestsMap {
   [key: string]: number;
 }
@@ -53,9 +48,9 @@ const educationItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
     styleName: 'nested',
   },
   {
-    title: 'School',
-    requestsKey: 'school',
-    to: '/education/requests/school',
+    title: 'K12',
+    requestsKey: 'k12',
+    to: '/education/requests/k12',
     styleName: 'nested',
   },
   {
@@ -90,7 +85,6 @@ const isMenuSubheader = (item: IMenuItem | IMenuDivider | IMenuSubheader) => {
   return (item as IMenuSubheader).subheader !== undefined
 }
 
-
 const menuItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
   { title: 'Accounts', to: '/accounts', icon: <PeopleIcon /> },
   { title: 'Organizations', to: '/organizations', icon: <BusinessIcon /> },
@@ -99,18 +93,23 @@ const menuItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
   {
     title: 'Trial requests',
     requestsKey: 'total',
-    icon: <SchoolIcon />,
+    icon: <Lightbulb />,
     group: true,
     items: educationItems,
   },
   {
-    title: 'Activation codes',
-    to: '/education/activation-codes',
+    title: 'Generate activation codes',
+    to: '/education/generate-activation-codes',
+    icon: <MonetizationOn />,
+  },
+  {
+    title: 'Check activation code',
+    to: '/education/check-activation-code',
     icon: <MonetizationOn />,
   },
 ];
 
-const drawerWidth = 250;
+const drawerWidth = 280;
 
 type IStylesMap = {
   [key: string]: any;
@@ -131,10 +130,10 @@ const Navigation = () => {
       width: drawerWidth,
     },
     nested: {
-      paddingLeft: theme.spacing(4),
+      paddingLeft: theme.spacing(9),
     },
     collapseIconWithBadge: {
-      marginLeft: 28,
+      marginLeft: 6,
     },
     badge: {
       '& .MuiBadge-badge': {
@@ -157,7 +156,7 @@ const Navigation = () => {
   let requestsCountMap: IRequestsMap | null = null
 
   if (requests.data) {
-    const requestsByType = _.groupBy(requests, 'type');
+    const requestsByType = _.groupBy(requests.data, 'type');
     requestsCountMap = _.mapValues(
       requestsByType,
       (values) => values.length
