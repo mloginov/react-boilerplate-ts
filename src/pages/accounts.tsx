@@ -13,15 +13,15 @@ import {
 } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
-import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { keepPreviousData } from '@tanstack/react-query';
+import MuiPagination from '@mui/material/Pagination';
 
 import { useAccounts } from '../features/accounts';
 import { Account } from '../api/accounts-manager';
-import { keepPreviousData } from '@tanstack/react-query';
-import MuiPagination from '@mui/material/Pagination';
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
@@ -62,8 +62,20 @@ const Accounts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string) : 0;
   const accounts = useAccounts(page, { placeholderData: keepPreviousData });
-  console.log(accounts);
   const navigate = useNavigate();
+  const getSortModelFromQuery = () => {
+    if (!searchParams.get('field') || !searchParams.get('sort')) {
+      return [];
+    }
+    const sort = searchParams.get('sort');
+    return [
+      {
+        field: searchParams.get('field') as string,
+        sort: sort === 'asc' ? ('asc' as const) : sort === 'desc' ? ('desc' as const) : null,
+      },
+    ];
+  };
+  const sortModel: GridSortModel = getSortModelFromQuery();
 
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -80,14 +92,23 @@ const Accounts = () => {
     return <CircularProgress />;
   }
 
-  const paginationModel = { pageSize: PAGE_SIZE, page };
-
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
     navigate(params.row.id);
   };
+  const onSortModelChange = (model: GridSortModel, _details: GridCallbackDetails) => {
+    if (model[0]?.sort) {
+      searchParams.set('field', model[0].field);
+      searchParams.set('sort', model[0].sort);
+    } else {
+      searchParams.delete('field');
+      searchParams.delete('sort');
+    }
+    setSearchParams(searchParams);
+  };
 
   const onPageChange = (_event: any, newPage: number) => {
-    setSearchParams({ page: newPage.toString() });
+    searchParams.set('page', newPage.toString());
+    setSearchParams(searchParams);
   };
   return (
     <>
@@ -121,10 +142,11 @@ const Accounts = () => {
           slotProps={{ pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page, onPageChange } }}
           rows={accounts.data.accounts}
           columns={columns}
-          paginationModel={paginationModel}
           pageSizeOptions={[PAGE_SIZE]}
           disableRowSelectionOnClick
           onRowClick={onRowClick}
+          sortModel={sortModel}
+          onSortModelChange={onSortModelChange}
           sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         ></DataGrid>
       </Box>
