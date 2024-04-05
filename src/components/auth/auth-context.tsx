@@ -6,11 +6,11 @@ export const AuthContext = React.createContext({
   isAuth: false,
 });
 
-export interface IAuthProviderProps {
+export interface AuthProviderProps {
   children: string | React.JSX.Element | React.JSX.Element[];
 }
 
-const AuthProvider = (props: IAuthProviderProps) => {
+const AuthProvider = (props: AuthProviderProps) => {
   // todo should be false by default
   const [isAuth, setAuth] = useState(true);
   const navigate = useNavigate();

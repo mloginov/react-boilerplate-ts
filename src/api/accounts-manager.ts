@@ -2,12 +2,12 @@ import { faker } from '@faker-js/faker';
 
 import { stall } from './helper';
 
-export interface IAccountsData {
-  accounts: IAccount[];
+export interface AccountsData {
+  accounts: Account[];
   totalCount: number;
 }
 
-export interface IAccount {
+export interface Account {
   id: string;
   userName: string;
   email: string;
@@ -17,7 +17,7 @@ export interface IAccount {
   connections: number;
 }
 
-const accountFixture = (): IAccount => ({
+const accountFixture = (): Account => ({
   id: faker.string.uuid(),
   userName: faker.internet.userName(),
   email: faker.internet.email(),
@@ -27,7 +27,7 @@ const accountFixture = (): IAccount => ({
   connections: faker.number.int({ max: 20 }),
 });
 
-export const fetchAccounts = async (): Promise<IAccountsData> => {
+export const fetchAccounts = async (): Promise<AccountsData> => {
   await stall(1000);
   const accounts = [...new Array(1027)].map(accountFixture);
   return {

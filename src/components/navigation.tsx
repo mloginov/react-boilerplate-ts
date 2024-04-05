@@ -24,11 +24,11 @@ import Lightbulb from '@mui/icons-material/Lightbulb';
 import { AuthContext } from './auth/auth-context';
 import { useAllRequests } from '../features/requests';
 
-interface IRequestsMap {
+interface RequestsMap {
   [key: string]: number;
 }
 
-const educationItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
+const educationItems: (MenuItem | MenuDivider | MenuSubheader)[] = [
   {
     title: 'University',
     requestsKey: 'university',
@@ -61,31 +61,31 @@ const educationItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
   },
 ];
 
-interface IMenuItem {
+interface MenuItem {
   title: string;
   to?: string;
   icon?: string | React.JSX.Element | React.JSX.Element[];
   group?: boolean;
   requestsKey?: string;
   styleName?: string;
-  items?: (IMenuItem | IMenuDivider | IMenuSubheader)[];
+  items?: (MenuItem | MenuDivider | MenuSubheader)[];
 }
-interface IMenuDivider {
+interface MenuDivider {
   divider: boolean;
   styleName?: string;
 }
-const isMenuDivider = (item: IMenuItem | IMenuDivider | IMenuSubheader) => {
-  return (item as IMenuDivider).divider !== undefined;
+const isMenuDivider = (item: MenuItem | MenuDivider | MenuSubheader) => {
+  return (item as MenuDivider).divider !== undefined;
 };
-interface IMenuSubheader {
+interface MenuSubheader {
   subheader: string;
   styleName?: string;
 }
-const isMenuSubheader = (item: IMenuItem | IMenuDivider | IMenuSubheader) => {
-  return (item as IMenuSubheader).subheader !== undefined;
+const isMenuSubheader = (item: MenuItem | MenuDivider | MenuSubheader) => {
+  return (item as MenuSubheader).subheader !== undefined;
 };
 
-const menuItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
+const menuItems: (MenuItem | MenuDivider | MenuSubheader)[] = [
   { title: 'Accounts', to: '/accounts', icon: <PeopleIcon /> },
   { title: 'Organizations', to: '/organizations', icon: <BusinessIcon /> },
   { divider: true },
@@ -153,7 +153,7 @@ const Navigation = () => {
     </ListItemButton>
   );
   const requests = useAllRequests({ enabled: isAuth });
-  let requestsCountMap: IRequestsMap | null = null;
+  let requestsCountMap: RequestsMap | null = null;
 
   if (requests.data) {
     const requestsByType = _.groupBy(requests.data, 'type');
@@ -161,15 +161,15 @@ const Navigation = () => {
     requestsCountMap.total = requests.data.length;
   }
 
-  const renderMenuItems = (items: (IMenuItem | IMenuDivider | IMenuSubheader)[], parentKey = '') => {
+  const renderMenuItems = (items: (MenuItem | MenuDivider | MenuSubheader)[], parentKey = '') => {
     const elements = items.map((item, index) => {
       const key = `${parentKey}-${index}`;
       if (isMenuDivider(item)) {
-        const divider = item as IMenuDivider;
+        const divider = item as MenuDivider;
         return <Divider key={key} sx={divider.styleName ? styles[divider.styleName] : undefined} />;
       }
       if (isMenuSubheader(item)) {
-        const subheader = item as IMenuSubheader;
+        const subheader = item as MenuSubheader;
         return (
           <ListSubheader
             key={key}
@@ -181,7 +181,7 @@ const Navigation = () => {
           </ListSubheader>
         );
       }
-      const menuItem = item as IMenuItem;
+      const menuItem = item as MenuItem;
       const icon = menuItem.icon ? <ListItemIcon>{menuItem.icon}</ListItemIcon> : null;
       const itemText = <ListItemText primary={menuItem.title} />;
       let listTextEl = itemText;

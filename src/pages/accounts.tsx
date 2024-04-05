@@ -20,13 +20,13 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { GridPaginationModel } from '@mui/x-data-grid/models/gridPaginationProps';
 
 import { useAccounts } from '../features/accounts';
-import { IAccount } from '../api/accounts-manager';
+import { Account } from '../api/accounts-manager';
 import { CustomPagination } from '../components/custom-grid-pagination';
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
 
-const columns: GridColDef<IAccount>[] = [
+const columns: GridColDef<Account>[] = [
   { field: 'userName', headerName: 'Username', flex: 1, minWidth: 200 },
   { field: 'email', headerName: 'Email', flex: 1, minWidth: 200 },
   {
