@@ -1,4 +1,4 @@
 export declare class App {
-    constructor();
-    private render;
+  constructor();
+  private render;
 }

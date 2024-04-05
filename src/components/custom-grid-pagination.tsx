@@ -1,13 +1,13 @@
-import {TablePaginationProps} from "@mui/material";
-import {gridPageCountSelector, GridPagination, useGridApiContext, useGridSelector} from "@mui/x-data-grid";
-import MuiPagination from "@mui/material/Pagination";
-import React from "react";
+import { TablePaginationProps } from '@mui/material';
+import { gridPageCountSelector, GridPagination, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
+import MuiPagination from '@mui/material/Pagination';
+import React from 'react';
 
 const Pagination = ({
-                      page,
-                      onPageChange,
-                      className,
-                    }: Pick<TablePaginationProps, 'page' | 'onPageChange' | 'className'>) => {
+  page,
+  onPageChange,
+  className,
+}: Pick<TablePaginationProps, 'page' | 'onPageChange' | 'className'>) => {
   const apiRef = useGridApiContext();
   const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 
@@ -22,8 +22,8 @@ const Pagination = ({
       }}
     />
   );
-}
+};
 
 export const CustomPagination = (props: any) => {
   return <GridPagination ActionsComponent={Pagination} {...props} />;
-}
+};

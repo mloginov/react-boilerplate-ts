@@ -12,7 +12,11 @@ export class Main {
   private render(): void {
     const container = document.getElementById('app');
     const root = createRoot(container!);
-    root.render(<BrowserRouter><App /></BrowserRouter>);
+    root.render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
   }
 }
 

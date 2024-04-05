@@ -1,17 +1,14 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import { AuthContext } from './auth/auth-context';
 
 export interface IProtectedRouteProps {
-  redirectPath?: string,
-  children?: string | React.JSX.Element | React.JSX.Element[]
+  redirectPath?: string;
+  children?: string | React.JSX.Element | React.JSX.Element[];
 }
 
-const ProtectedRoute = ({
-  redirectPath = '/login',
-  children
-}: IProtectedRouteProps) => {
+const ProtectedRoute = ({ redirectPath = '/login', children }: IProtectedRouteProps) => {
   const { isAuth } = useContext(AuthContext);
   if (!isAuth) {
     return <Navigate to={redirectPath} replace />;
@@ -20,4 +17,4 @@ const ProtectedRoute = ({
   return children || <Outlet />;
 };
 
-export default ProtectedRoute
+export default ProtectedRoute;

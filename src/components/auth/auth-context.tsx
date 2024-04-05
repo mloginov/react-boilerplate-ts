@@ -7,26 +7,22 @@ export const AuthContext = React.createContext({
 });
 
 export interface IAuthProviderProps {
-  children: string | React.JSX.Element | React.JSX.Element[]
+  children: string | React.JSX.Element | React.JSX.Element[];
 }
 
 const AuthProvider = (props: IAuthProviderProps) => {
   // todo should be false by default
   const [isAuth, setAuth] = useState(true);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const login = () => {
     setTimeout(() => {
-      setAuth(true)
-      navigate('/accounts')
+      setAuth(true);
+      navigate('/accounts');
     }, 1000);
   };
-  const value = useMemo(() => ({isAuth, login}), [isAuth]);
+  const value = useMemo(() => ({ isAuth, login }), [isAuth]);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {props.children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;
 };
 
 const AuthConsumer = AuthContext.Consumer;

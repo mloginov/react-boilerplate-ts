@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton'
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
@@ -22,7 +22,7 @@ import MonetizationOn from '@mui/icons-material/MonetizationOn';
 import Lightbulb from '@mui/icons-material/Lightbulb';
 
 import { AuthContext } from './auth/auth-context';
-import {useAllRequests} from "../features/requests";
+import { useAllRequests } from '../features/requests';
 
 interface IRequestsMap {
   [key: string]: number;
@@ -62,28 +62,28 @@ const educationItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
 ];
 
 interface IMenuItem {
-  title: string,
-  to?: string,
-  icon?: string | React.JSX.Element | React.JSX.Element[],
-  group?: boolean,
-  requestsKey?: string,
-  styleName?: string
-  items?: (IMenuItem | IMenuDivider | IMenuSubheader)[]
+  title: string;
+  to?: string;
+  icon?: string | React.JSX.Element | React.JSX.Element[];
+  group?: boolean;
+  requestsKey?: string;
+  styleName?: string;
+  items?: (IMenuItem | IMenuDivider | IMenuSubheader)[];
 }
 interface IMenuDivider {
-  divider: boolean,
-  styleName?: string
+  divider: boolean;
+  styleName?: string;
 }
 const isMenuDivider = (item: IMenuItem | IMenuDivider | IMenuSubheader) => {
-  return (item as IMenuDivider).divider !== undefined
-}
+  return (item as IMenuDivider).divider !== undefined;
+};
 interface IMenuSubheader {
-  subheader: string,
-  styleName?: string
+  subheader: string;
+  styleName?: string;
 }
 const isMenuSubheader = (item: IMenuItem | IMenuDivider | IMenuSubheader) => {
-  return (item as IMenuSubheader).subheader !== undefined
-}
+  return (item as IMenuSubheader).subheader !== undefined;
+};
 
 const menuItems: (IMenuItem | IMenuDivider | IMenuSubheader)[] = [
   { title: 'Accounts', to: '/accounts', icon: <PeopleIcon /> },
@@ -117,7 +117,7 @@ type IStylesMap = {
 
 const Navigation = () => {
   const { isAuth, login } = useContext(AuthContext);
-  const theme = useTheme()
+  const theme = useTheme();
   const navigate = useNavigate();
   const [openRequests, setOpenRequests] = useState(true);
 
@@ -140,7 +140,7 @@ const Navigation = () => {
         right: -16,
         top: 15,
         padding: '0 4px',
-      }
+      },
     },
   };
 
@@ -151,16 +151,13 @@ const Navigation = () => {
       </ListItemIcon>
       <ListItemText primary="Login" />
     </ListItemButton>
-  )
-  const requests = useAllRequests({enabled: isAuth})
-  let requestsCountMap: IRequestsMap | null = null
+  );
+  const requests = useAllRequests({ enabled: isAuth });
+  let requestsCountMap: IRequestsMap | null = null;
 
   if (requests.data) {
     const requestsByType = _.groupBy(requests.data, 'type');
-    requestsCountMap = _.mapValues(
-      requestsByType,
-      (values) => values.length
-    );
+    requestsCountMap = _.mapValues(requestsByType, (values) => values.length);
     requestsCountMap.total = requests.data.length;
   }
 
@@ -168,11 +165,11 @@ const Navigation = () => {
     const elements = items.map((item, index) => {
       const key = `${parentKey}-${index}`;
       if (isMenuDivider(item)) {
-        const divider = item as IMenuDivider
+        const divider = item as IMenuDivider;
         return <Divider key={key} sx={divider.styleName ? styles[divider.styleName] : undefined} />;
       }
       if (isMenuSubheader(item)) {
-        const subheader = item as IMenuSubheader
+        const subheader = item as IMenuSubheader;
         return (
           <ListSubheader
             key={key}
@@ -184,7 +181,7 @@ const Navigation = () => {
           </ListSubheader>
         );
       }
-      const menuItem = item as IMenuItem
+      const menuItem = item as IMenuItem;
       const icon = menuItem.icon ? <ListItemIcon>{menuItem.icon}</ListItemIcon> : null;
       const itemText = <ListItemText primary={menuItem.title} />;
       let listTextEl = itemText;
@@ -201,9 +198,7 @@ const Navigation = () => {
         );
       }
       if (menuItem.group) {
-        const collapseIconStyle = menuItem.requestsKey
-          ? styles.collapseIconWithBadge
-          : undefined;
+        const collapseIconStyle = menuItem.requestsKey ? styles.collapseIconWithBadge : undefined;
         return (
           <React.Fragment key={key}>
             <ListItemButton
@@ -212,11 +207,7 @@ const Navigation = () => {
             >
               {icon}
               {listTextEl}
-              {openRequests ? (
-                <ExpandLess sx={collapseIconStyle} />
-              ) : (
-                <ExpandMore sx={collapseIconStyle} />
-              )}
+              {openRequests ? <ExpandLess sx={collapseIconStyle} /> : <ExpandMore sx={collapseIconStyle} />}
             </ListItemButton>
             <Collapse in={openRequests} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
@@ -241,20 +232,13 @@ const Navigation = () => {
   };
 
   if (isAuth) {
-    menu = renderMenuItems(menuItems)
+    menu = renderMenuItems(menuItems);
   }
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={styles.drawer}
-      PaperProps={{sx: styles.drawerPaper}}
-      anchor="left"
-    >
+    <Drawer variant="permanent" sx={styles.drawer} PaperProps={{ sx: styles.drawerPaper }} anchor="left">
       <List>
-        <div>
-          {menu}
-        </div>
+        <div>{menu}</div>
       </List>
     </Drawer>
   );

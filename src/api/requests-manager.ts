@@ -2,18 +2,12 @@ import { faker } from '@faker-js/faker';
 
 import { stall } from './helper';
 
-const types = [
-  'university',
-  'bootcamps',
-  'profTraining',
-  'k12',
-  'enterprise',
-];
+const types = ['university', 'bootcamps', 'profTraining', 'k12', 'enterprise'];
 
 export interface IRequest {
-  id: string,
-  name: string,
-  type: string
+  id: string;
+  name: string;
+  type: string;
 }
 
 const requestFixture = (): IRequest => ({

@@ -3,18 +3,18 @@ import { faker } from '@faker-js/faker';
 import { stall } from './helper';
 
 export interface IAccountsData {
-  accounts: IAccount[],
-  totalCount: number
+  accounts: IAccount[];
+  totalCount: number;
 }
 
 export interface IAccount {
-  id: string,
-  userName: string,
-  email: string,
-  createdAt: Date,
-  lastLogin: Date,
-  projects: number,
-  connections: number
+  id: string;
+  userName: string;
+  email: string;
+  createdAt: Date;
+  lastLogin: Date;
+  projects: number;
+  connections: number;
 }
 
 const accountFixture = (): IAccount => ({
@@ -23,8 +23,8 @@ const accountFixture = (): IAccount => ({
   email: faker.internet.email(),
   createdAt: faker.date.past(),
   lastLogin: faker.date.recent(),
-  projects: faker.number.int({max: 100}),
-  connections: faker.number.int({max: 20})
+  projects: faker.number.int({ max: 100 }),
+  connections: faker.number.int({ max: 20 }),
 });
 
 export const fetchAccounts = async (): Promise<IAccountsData> => {
@@ -32,6 +32,6 @@ export const fetchAccounts = async (): Promise<IAccountsData> => {
   const accounts = [...new Array(1027)].map(accountFixture);
   return {
     accounts,
-    totalCount: accounts.length
+    totalCount: accounts.length,
   };
 };
