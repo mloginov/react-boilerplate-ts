@@ -11,7 +11,8 @@ export interface IAuthProviderProps {
 }
 
 const AuthProvider = (props: IAuthProviderProps) => {
-  const [isAuth, setAuth] = useState(false);
+  // todo should be false by default
+  const [isAuth, setAuth] = useState(true);
   const navigate = useNavigate()
   const login = () => {
     setTimeout(() => {

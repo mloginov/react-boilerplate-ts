@@ -2,6 +2,11 @@ import { faker } from '@faker-js/faker';
 
 import { stall } from './helper';
 
+export interface IAccountsData {
+  accounts: IAccount[],
+  totalCount: number
+}
+
 export interface IAccount {
   id: string,
   userName: string,
@@ -22,7 +27,11 @@ const accountFixture = (): IAccount => ({
   connections: faker.number.int({max: 20})
 });
 
-export const fetchAccounts = async (): Promise<IAccount[]> => {
+export const fetchAccounts = async (): Promise<IAccountsData> => {
   await stall(1000);
-  return [...new Array(127)].map(accountFixture);
+  const accounts = [...new Array(1027)].map(accountFixture);
+  return {
+    accounts,
+    totalCount: accounts.length
+  };
 };

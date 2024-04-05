@@ -13,15 +13,18 @@ import {
 } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import Divider from "@mui/material/Divider";
-import {DataGrid, GridColDef} from "@mui/x-data-grid";
+import {DataGrid, GridColDef, GridEventListener} from "@mui/x-data-grid";
 import dayjs from 'dayjs'
+import {useNavigate, useSearchParams} from "react-router-dom";
+import relativeTime from 'dayjs/plugin/relativeTime'
+import {GridPaginationModel} from "@mui/x-data-grid/models/gridPaginationProps";
 
 import {useAccounts} from "../features/accounts";
 import {IAccount} from "../api/accounts-manager";
-import {useSearchParams} from "react-router-dom";
-
-import relativeTime from 'dayjs/plugin/relativeTime'
+import {CustomPagination} from "../components/custom-grid-pagination";
 dayjs.extend(relativeTime)
+
+const PAGE_SIZE = 20
 
 const columns: GridColDef<IAccount>[] = [
   {field: 'userName', headerName: 'Username', flex: 1, minWidth: 200},
@@ -43,9 +46,10 @@ const columns: GridColDef<IAccount>[] = [
 ]
 
 const Accounts = () => {
-  const [searchParams, /*setSearchParams*/] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string) : 0
   const accounts = useAccounts(page)
+  const navigate = useNavigate()
 
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault()
@@ -55,17 +59,25 @@ const Accounts = () => {
     }
   }
 
-  if (accounts.isFetching) {
-    return <CircularProgress />
-  }
   if (accounts.isError) {
-    // todo show retry action
     return <Alert severity="error">Load accounts failed.</Alert>
   }
+  if (accounts.isFetching || !accounts.data) {
+    return <CircularProgress />
+  }
+
+  const paginationModel = {pageSize: PAGE_SIZE, page}
+  const setPaginationModel = (model: GridPaginationModel) => {
+    setSearchParams({page: model.page.toString()})
+  }
+
+  const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    navigate(params.row.id)
+  };
 
   return (
     <>
-      <Badge badgeContent={15348} color="primary" max={100000}>
+      <Badge badgeContent={accounts.data?.totalCount} color="primary" max={100000}>
         <Typography variant='h3' component='h1'>
           Accounts
         </Typography>
@@ -89,17 +101,16 @@ const Accounts = () => {
       </Paper>
       <Box sx={{height: 1151, marginTop: 1}}>
         <DataGrid
-          rows={accounts.data}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 20,
-              },
-            },
+          slots={{
+            pagination: CustomPagination,
           }}
-          pageSizeOptions={[20]}
+          rows={accounts.data.accounts}
+          columns={columns}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[PAGE_SIZE]}
           disableRowSelectionOnClick
+          onRowClick={onRowClick}
         ></DataGrid>
       </Box>
     </>
