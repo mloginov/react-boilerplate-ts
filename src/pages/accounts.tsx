@@ -17,11 +17,11 @@ import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { GridPaginationModel } from '@mui/x-data-grid/models/gridPaginationProps';
 
 import { useAccounts } from '../features/accounts';
 import { Account } from '../api/accounts-manager';
-import { CustomPagination } from '../components/custom-grid-pagination';
+import { keepPreviousData } from '@tanstack/react-query';
+import MuiPagination from '@mui/material/Pagination';
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
@@ -45,10 +45,24 @@ const columns: GridColDef<Account>[] = [
   { field: 'connections', headerName: 'Connections', width: 100, type: 'number' },
 ];
 
+const CustomPagination = ({ page, onPageChange, count }: any) => {
+  return (
+    <MuiPagination
+      color="primary"
+      count={count}
+      page={page + 1}
+      onChange={(event, newPage) => {
+        onPageChange(event as any, newPage - 1);
+      }}
+    />
+  );
+};
+
 const Accounts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string) : 0;
-  const accounts = useAccounts(page);
+  const accounts = useAccounts(page, { placeholderData: keepPreviousData });
+  console.log(accounts);
   const navigate = useNavigate();
 
   const onSubmit = (e: SyntheticEvent) => {
@@ -62,19 +76,19 @@ const Accounts = () => {
   if (accounts.isError) {
     return <Alert severity="error">Load accounts failed.</Alert>;
   }
-  if (accounts.isFetching || !accounts.data) {
+  if (accounts.isPending || !accounts.data) {
     return <CircularProgress />;
   }
 
   const paginationModel = { pageSize: PAGE_SIZE, page };
-  const setPaginationModel = (model: GridPaginationModel) => {
-    setSearchParams({ page: model.page.toString() });
-  };
 
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
     navigate(params.row.id);
   };
 
+  const onPageChange = (_event: any, newPage: number) => {
+    setSearchParams({ page: newPage.toString() });
+  };
   return (
     <>
       <Badge badgeContent={accounts.data?.totalCount} color="primary" max={100000}>
@@ -104,10 +118,10 @@ const Accounts = () => {
       <Box sx={{ marginTop: 1 }}>
         <DataGrid
           slots={{ pagination: CustomPagination }}
+          slotProps={{ pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page, onPageChange } }}
           rows={accounts.data.accounts}
           columns={columns}
           paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[PAGE_SIZE]}
           disableRowSelectionOnClick
           onRowClick={onRowClick}

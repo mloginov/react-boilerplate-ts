@@ -29,9 +29,9 @@ const accountFixture = (): Account => ({
 
 export const fetchAccounts = async (): Promise<AccountsData> => {
   await stall(1000);
-  const accounts = [...new Array(1027)].map(accountFixture);
+  const accounts = [...new Array(20)].map(accountFixture);
   return {
     accounts,
-    totalCount: accounts.length,
+    totalCount: 1027,
   };
 };
