@@ -1,18 +1,19 @@
 import * as accountsManager from '../api/accounts-manager';
 import { useQuery } from '@tanstack/react-query';
+import { AccountListView } from '../api/accounts-manager';
 
 const accountsKeys = {
   all: ['accounts'] as const,
   lists: () => [...accountsKeys.all, 'list'] as const,
-  list: (page: number) => [...accountsKeys.lists(), page] as const,
+  list: (view: AccountListView) => [...accountsKeys.lists(), view] as const,
   details: () => [...accountsKeys.all, 'detail'] as const,
   detail: (id: number) => [...accountsKeys.details(), id] as const,
 };
 
-export const useAccounts = (page: number, options: object = {}) => {
+export const useAccounts = (view: AccountListView, options: object = {}) => {
   return useQuery({
-    queryKey: accountsKeys.list(page),
-    queryFn: accountsManager.fetchAccounts,
+    queryKey: accountsKeys.list(view),
+    queryFn: () => accountsManager.fetchAccounts(view),
     ...options,
   });
 };

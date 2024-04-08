@@ -1,27 +1,27 @@
-import React, { SyntheticEvent } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import React, { SyntheticEvent, useState } from 'react';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import CircularProgress from '@mui/material/CircularProgress';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
+import Pagination from '@mui/material/Pagination';
 import { DataGrid, GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { keepPreviousData } from '@tanstack/react-query';
-import MuiPagination from '@mui/material/Pagination';
 
 import { useAccounts } from '../features/accounts';
 import { Account } from '../api/accounts-manager';
+import { getSortModelFromQuery } from '../components/helpers';
+
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
@@ -47,7 +47,7 @@ const columns: GridColDef<Account>[] = [
 
 const CustomPagination = ({ page, onPageChange, count }: any) => {
   return (
-    <MuiPagination
+    <Pagination
       color="primary"
       count={count}
       page={page + 1}
@@ -61,28 +61,25 @@ const CustomPagination = ({ page, onPageChange, count }: any) => {
 const Accounts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string) : 0;
-  const accounts = useAccounts(page, { placeholderData: keepPreviousData });
-  const navigate = useNavigate();
-  const getSortModelFromQuery = () => {
-    if (!searchParams.get('field') || !searchParams.get('sort')) {
-      return [];
-    }
-    const sort = searchParams.get('sort');
-    return [
-      {
-        field: searchParams.get('field') as string,
-        sort: sort === 'asc' ? ('asc' as const) : sort === 'desc' ? ('desc' as const) : null,
-      },
-    ];
+  const [filters, setFilters] = useState({});
+  const sortModel: GridSortModel = getSortModelFromQuery(searchParams);
+  const view = {
+    filter: { page, ...filters },
+    sort: !!sortModel[0]?.sort ? sortModel[0] : null,
   };
-  const sortModel: GridSortModel = getSortModelFromQuery();
+  const accounts = useAccounts(view, { placeholderData: keepPreviousData });
+  const navigate = useNavigate();
 
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     const data = new FormData(e.target as HTMLFormElement);
+    const result: Record<string, any> = {};
     for (const pair of data.entries()) {
-      console.log(pair[0], pair[1]);
+      if (pair[1]) {
+        result[pair[0]] = pair[1];
+      }
     }
+    setFilters({ ...result, suspended: result.suspended === 'on' });
   };
 
   if (accounts.isError) {
@@ -125,8 +122,8 @@ const Accounts = () => {
             <TextField name="id" label="Id" variant="outlined" size="small" />
             <TextField name="email" type="email" label="Email" variant="outlined" size="small" />
             <TextField name="project" label="Project" variant="outlined" size="small" />
-            <TextField name="Backend domain" label="domain" variant="outlined" size="small" />
-            <FormControlLabel control={<Checkbox name="Suspended" />} label="Suspended" />
+            <TextField name="domain" label="Backend domain" variant="outlined" size="small" />
+            <FormControlLabel control={<Checkbox name="suspended" />} label="Suspended" />
           </Stack>
           <Stack direction="row" gap={1}>
             <Button variant="contained" type="submit">

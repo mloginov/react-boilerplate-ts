@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { stall } from './helper';
+import { ListView, PageFilter, stall } from './helper';
 
 export interface AccountsData {
   accounts: Account[];
@@ -17,6 +17,19 @@ export interface Account {
   connections: number;
 }
 
+interface AccountViewFilter extends PageFilter {
+  username?: string;
+  id?: string;
+  email?: string;
+  project?: string;
+  domain?: string;
+  suspended?: boolean;
+}
+
+export interface AccountListView extends ListView {
+  filter: AccountViewFilter;
+}
+
 const accountFixture = (): Account => ({
   id: faker.string.uuid(),
   userName: faker.internet.userName(),
@@ -27,7 +40,8 @@ const accountFixture = (): Account => ({
   connections: faker.number.int({ max: 20 }),
 });
 
-export const fetchAccounts = async (): Promise<AccountsData> => {
+export const fetchAccounts = async (view: AccountListView): Promise<AccountsData> => {
+  console.log('fetchAccounts view', view);
   await stall(1000);
   const accounts = [...new Array(20)].map(accountFixture);
   return {
