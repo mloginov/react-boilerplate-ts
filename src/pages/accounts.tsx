@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -19,7 +19,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { keepPreviousData } from '@tanstack/react-query';
 
 import { useAccounts } from '../features/accounts';
-import { Account } from '../api/accounts-manager';
+import { Account, AccountViewFilter } from '../api/accounts-manager';
 import { getSortModelFromQuery } from '../components/helpers';
 
 dayjs.extend(relativeTime);
@@ -58,13 +58,36 @@ const CustomPagination = ({ page, onPageChange, count }: any) => {
   );
 };
 
+const getFiltersFromSearchParams = (searchParams: URLSearchParams): AccountViewFilter => {
+  return {
+    username: searchParams.get('username'),
+    id: searchParams.get('id'),
+    email: searchParams.get('email'),
+    project: searchParams.get('project'),
+    domain: searchParams.get('domain'),
+    suspended: searchParams.get('suspended') === 'on',
+    page: searchParams.has('page') ? parseInt(searchParams.get('page') as string) : 0,
+  };
+};
+
+const isSearchChanged = (oldFilter: AccountViewFilter, newFilter: AccountViewFilter) => {
+  const { page: page1, ...restA } = oldFilter;
+  const { page: page2, ...restB } = newFilter;
+  return JSON.stringify(restA) !== JSON.stringify(restB);
+};
+
 const Accounts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string) : 0;
-  const [filters, setFilters] = useState({});
   const sortModel: GridSortModel = getSortModelFromQuery(searchParams);
+  const [filter, setFilter] = useState(() => getFiltersFromSearchParams(searchParams));
+  const [formData, setFormData] = useState(filter);
+  useEffect(() => {
+    const f = getFiltersFromSearchParams(searchParams);
+    isSearchChanged(filter, f) || (searchParams.toString() === '' && setFormData(f));
+    setFilter(f);
+  }, [searchParams]);
   const view = {
-    filter: { page, ...filters },
+    filter,
     sort: !!sortModel[0]?.sort ? sortModel[0] : null,
   };
   const accounts = useAccounts(view, { placeholderData: keepPreviousData });
@@ -73,13 +96,21 @@ const Accounts = () => {
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     const data = new FormData(e.target as HTMLFormElement);
-    const result: Record<string, any> = {};
+    const newSearchParams = new URLSearchParams(searchParams);
     for (const pair of data.entries()) {
       if (pair[1]) {
-        result[pair[0]] = pair[1];
+        newSearchParams.set(pair[0], pair[1].toString());
+      } else {
+        newSearchParams.delete(pair[0]);
       }
     }
-    setFilters({ ...result, suspended: result.suspended === 'on' });
+    setSearchParams(newSearchParams);
+  };
+  const onReset = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const newSearchParams = new URLSearchParams();
+    setSearchParams(newSearchParams);
+    setFormData(getFiltersFromSearchParams(newSearchParams));
   };
 
   if (accounts.isError) {
@@ -93,19 +124,27 @@ const Accounts = () => {
     navigate(params.row.id);
   };
   const onSortModelChange = (model: GridSortModel, _details: GridCallbackDetails) => {
+    const newSearchParams = new URLSearchParams(searchParams);
     if (model[0]?.sort) {
-      searchParams.set('field', model[0].field);
-      searchParams.set('sort', model[0].sort);
+      newSearchParams.set('field', model[0].field);
+      newSearchParams.set('sort', model[0].sort);
     } else {
-      searchParams.delete('field');
-      searchParams.delete('sort');
+      newSearchParams.delete('field');
+      newSearchParams.delete('sort');
     }
-    setSearchParams(searchParams);
+    setSearchParams(newSearchParams);
   };
 
   const onPageChange = (_event: any, newPage: number) => {
-    searchParams.set('page', newPage.toString());
-    setSearchParams(searchParams);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('page', newPage.toString());
+    setSearchParams(newSearchParams);
+  };
+  const onControlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.name !== 'suspended' ? event.target.value : event.target.checked,
+    });
   };
   return (
     <>
@@ -118,25 +157,68 @@ const Accounts = () => {
       <Paper variant="outlined" sx={{ padding: 2 }}>
         <Box component="form" noValidate onSubmit={onSubmit} sx={{ maxWidth: 300 }}>
           <Stack gap={1}>
-            <TextField name="username" label="Username" variant="outlined" size="small" />
-            <TextField name="id" label="Id" variant="outlined" size="small" />
-            <TextField name="email" type="email" label="Email" variant="outlined" size="small" />
-            <TextField name="project" label="Project" variant="outlined" size="small" />
-            <TextField name="domain" label="Backend domain" variant="outlined" size="small" />
-            <FormControlLabel control={<Checkbox name="suspended" />} label="Suspended" />
+            <TextField
+              name="username"
+              label="Username"
+              variant="outlined"
+              size="small"
+              value={formData.username || ''}
+              onChange={onControlChange}
+            />
+            <TextField
+              name="id"
+              label="Id"
+              variant="outlined"
+              size="small"
+              value={formData.id || ''}
+              onChange={onControlChange}
+            />
+            <TextField
+              name="email"
+              type="email"
+              label="Email"
+              variant="outlined"
+              size="small"
+              value={formData.email || ''}
+              onChange={onControlChange}
+            />
+            <TextField
+              name="project"
+              label="Project"
+              variant="outlined"
+              size="small"
+              value={formData.project || ''}
+              onChange={onControlChange}
+            />
+            <TextField
+              name="domain"
+              label="Backend domain"
+              variant="outlined"
+              size="small"
+              value={formData.domain || ''}
+              onChange={onControlChange}
+            />
+            <FormControlLabel
+              control={<Checkbox name="suspended" checked={formData.suspended} onChange={onControlChange} />}
+              label="Suspended"
+            />
           </Stack>
           <Stack direction="row" gap={1}>
             <Button variant="contained" type="submit">
               Search
             </Button>
-            <Button variant="text">Reset</Button>
+            <Button variant="text" onClick={onReset}>
+              Reset
+            </Button>
           </Stack>
         </Box>
       </Paper>
       <Box sx={{ marginTop: 1 }}>
         <DataGrid
           slots={{ pagination: CustomPagination }}
-          slotProps={{ pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page, onPageChange } }}
+          slotProps={{
+            pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page: filter.page, onPageChange },
+          }}
           rows={accounts.data.accounts}
           columns={columns}
           pageSizeOptions={[PAGE_SIZE]}

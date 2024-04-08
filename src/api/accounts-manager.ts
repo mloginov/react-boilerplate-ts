@@ -17,12 +17,12 @@ export interface Account {
   connections: number;
 }
 
-interface AccountViewFilter extends PageFilter {
-  username?: string;
-  id?: string;
-  email?: string;
-  project?: string;
-  domain?: string;
+export interface AccountViewFilter extends PageFilter {
+  username?: string | null;
+  id?: string | null;
+  email?: string | null;
+  project?: string | null;
+  domain?: string | null;
   suspended?: boolean;
 }
 
