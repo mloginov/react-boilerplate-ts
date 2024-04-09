@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { SyntheticEvent } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAccountDetails } from '../../features/accounts';
 import { keepPreviousData } from '@tanstack/react-query';
 import Alert from '@mui/material/Alert';
@@ -22,12 +22,15 @@ import EducationStatus from './details/education-status';
 import Projects from './details/projects';
 import Details from './details/details';
 import IPs from './details/ips';
+import Badge from '@mui/material/Badge';
 
 const AccountDetails = () => {
   const params = useParams();
-  console.log('AccountDetails params', params);
   const accountInfo = useAccountDetails(params.id || '', { placeholderData: keepPreviousData });
-  const [activeTab, setActiveTab] = useState('0');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const onTabChange = (_: SyntheticEvent, tab: any) => {
+    setSearchParams(new URLSearchParams({ tab }));
+  };
   if (accountInfo.isError) {
     return <Alert severity="error">Load account data failed.</Alert>;
   }
@@ -64,12 +67,19 @@ const AccountDetails = () => {
           <Typography variant="body2">Created at: {dayjs(accountInfo.data.createdAt).fromNow()}</Typography>
         </Stack>
       </Stack>
-      <TabContext value={activeTab}>
+      <TabContext value={searchParams.get('tab') || '0'}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={(_, tab) => setActiveTab(tab)} aria-label="lab API tabs example">
+          <TabList onChange={onTabChange} aria-label="lab API tabs example">
             <Tab label="Subscription" value="0" />
             <Tab label="Education Status" value="1" />
-            <Tab label="Projects" value="2" />
+            <Tab
+              label={
+                <Badge badgeContent={accountInfo.data?.projectsCount} color="primary" max={10000}>
+                  Projects
+                </Badge>
+              }
+              value="2"
+            />
             <Tab label="Details" value="3" />
             <Tab label="IPs" value="4" />
           </TabList>
@@ -81,7 +91,7 @@ const AccountDetails = () => {
           <EducationStatus />
         </TabPanel>
         <TabPanel value="2">
-          <Projects />
+          <Projects accountInfo={accountInfo.data} />
         </TabPanel>
         <TabPanel value="3">
           <Details />

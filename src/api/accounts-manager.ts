@@ -35,15 +35,6 @@ enum UserType {
   STUDENT = 'STUDENT',
 }
 
-interface Project {
-  id: string;
-  name: string;
-  fileServer: string;
-  createdAt: Date;
-  lastAccessed: Date;
-  private: boolean;
-}
-
 export interface AccountDetails {
   id: string;
   userName: string;
@@ -53,7 +44,7 @@ export interface AccountDetails {
   lastLogin: Date;
   subscription: any;
   status: any;
-  projects: Project[];
+  projectsCount: number;
   type: UserType;
   ips: string[];
 }
@@ -78,17 +69,6 @@ export const fetchAccounts = async (view: AccountListView): Promise<AccountsData
   };
 };
 
-const projectFixture = (): Project => {
-  return {
-    id: faker.string.uuid(),
-    name: faker.internet.userName(),
-    fileServer: faker.internet.domainName(),
-    createdAt: faker.date.past(),
-    lastAccessed: faker.date.recent(),
-    private: faker.datatype.boolean(),
-  };
-};
-
 const accountDetailsFixture = (): AccountDetails => {
   return {
     id: faker.string.uuid(),
@@ -101,7 +81,7 @@ const accountDetailsFixture = (): AccountDetails => {
     status: null,
     type: faker.helpers.arrayElement([UserType.STUDENT, UserType.TEACHER]),
     ips: [...new Array(faker.number.int({ min: 1, max: 10 }))].map(faker.internet.ip),
-    projects: [...new Array(faker.number.int({ min: 1, max: 10 }))].map(projectFixture),
+    projectsCount: faker.number.int({ max: 5000 }),
   };
 };
 

@@ -11,7 +11,6 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
-import Pagination from '@mui/material/Pagination';
 import { DataGrid, GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -21,6 +20,7 @@ import { keepPreviousData } from '@tanstack/react-query';
 import { useAccounts } from '../features/accounts';
 import { Account, AccountViewFilter } from '../api/accounts-manager';
 import { getSortModelFromQuery } from '../components/helpers';
+import CustomPagination from '../components/helpers/custom-grid-pagination';
 
 dayjs.extend(relativeTime);
 
@@ -32,31 +32,18 @@ const columns: GridColDef<Account>[] = [
   {
     field: 'createdAt',
     headerName: 'Created',
-    width: 150,
+    width: 120,
     valueGetter: (value: Date) => dayjs(value).fromNow(),
   },
   {
     field: 'lastLogin',
     headerName: 'Last Login',
-    width: 150,
+    width: 120,
     valueGetter: (value: Date) => dayjs(value).fromNow(),
   },
   { field: 'projects', headerName: 'Projects', width: 100, type: 'number' },
   { field: 'connections', headerName: 'Connections', width: 100, type: 'number' },
 ];
-
-const CustomPagination = ({ page, onPageChange, count }: any) => {
-  return (
-    <Pagination
-      color="primary"
-      count={count}
-      page={page + 1}
-      onChange={(event, newPage) => {
-        onPageChange(event as any, newPage - 1);
-      }}
-    />
-  );
-};
 
 const getFiltersFromSearchParams = (searchParams: URLSearchParams): AccountViewFilter => {
   return {
@@ -156,7 +143,7 @@ const Accounts = () => {
       </Badge>
       <Paper variant="outlined" sx={{ padding: 2 }}>
         <Box component="form" noValidate onSubmit={onSubmit} sx={{ maxWidth: 300 }}>
-          <Stack gap={1}>
+          <Stack spacing={1}>
             <TextField
               name="username"
               label="Username"
@@ -203,7 +190,7 @@ const Accounts = () => {
               label="Suspended"
             />
           </Stack>
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" spacing={2}>
             <Button variant="contained" type="submit">
               Search
             </Button>
