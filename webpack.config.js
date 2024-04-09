@@ -7,6 +7,7 @@ module.exports = {
     vendor: ['react', 'react-dom'],
   },
   output: {
+    publicPath: "/",
     path: path.resolve(__dirname, 'dist'),
     filename: 'js/[name].bundle.js',
   },

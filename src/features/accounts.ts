@@ -7,13 +7,21 @@ const accountsKeys = {
   lists: () => [...accountsKeys.all, 'list'] as const,
   list: (view: AccountListView) => [...accountsKeys.lists(), view] as const,
   details: () => [...accountsKeys.all, 'detail'] as const,
-  detail: (id: number) => [...accountsKeys.details(), id] as const,
+  detail: (id: string) => [...accountsKeys.details(), id] as const,
 };
 
 export const useAccounts = (view: AccountListView, options: object = {}) => {
   return useQuery({
     queryKey: accountsKeys.list(view),
     queryFn: () => accountsManager.fetchAccounts(view),
+    ...options,
+  });
+};
+
+export const useAccountDetails = (id: string, options: object = {}) => {
+  return useQuery({
+    queryKey: accountsKeys.detail(id),
+    queryFn: () => accountsManager.fetchDetails(id),
     ...options,
   });
 };
