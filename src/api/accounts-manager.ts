@@ -61,7 +61,7 @@ const accountFixture = (): Account => ({
 
 export const fetchAccounts = async (view: AccountListView): Promise<AccountsData> => {
   console.log('fetchAccounts view', view);
-  await stall(1000);
+  await stall();
   const accounts = [...new Array(20)].map(accountFixture);
   return {
     accounts,
@@ -87,6 +87,6 @@ const accountDetailsFixture = (): AccountDetails => {
 
 export const fetchDetails = async (id: string): Promise<AccountDetails> => {
   console.log('account fetchDetails', id);
-  await stall(1000);
+  await stall();
   return accountDetailsFixture();
 };

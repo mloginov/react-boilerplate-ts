@@ -1,12 +1,9 @@
-import isEqual from 'lodash/isEqual';
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -17,54 +14,50 @@ import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { keepPreviousData } from '@tanstack/react-query';
+import EmailIcon from '@mui/icons-material/Email';
 
-import { useAccounts } from '../features/accounts';
-import { Account, AccountViewFilter } from '../api/accounts-manager';
 import { getSortModelFromQuery } from '../components/helpers';
 import CustomPagination from '../components/helpers/custom-grid-pagination';
+import { Link } from '@mui/material';
+import { Organization, OrganizationViewFilter } from '../api/organizations-manager';
+import { useOrganizations } from '../features/organizations';
 
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
 
-const columns: GridColDef<Account>[] = [
-  { field: 'userName', headerName: 'Username', flex: 1, minWidth: 200 },
-  { field: 'email', headerName: 'Email', flex: 1, minWidth: 200 },
+const columns: GridColDef<Organization>[] = [
   {
-    field: 'createdAt',
-    headerName: 'Created',
-    width: 120,
-    valueGetter: (value: Date) => dayjs(value).fromNow(),
+    field: 'email',
+    headerName: '',
+    width: 50,
+    renderCell: (params) => {
+      return (
+        <Link href={`mailto:${params.row.email}`} onClick={(e) => e.stopPropagation()}>
+          <EmailIcon sx={{ height: '100%' }} />
+        </Link>
+      );
+    },
   },
-  {
-    field: 'lastLogin',
-    headerName: 'Last Login',
-    width: 120,
-    valueGetter: (value: Date) => dayjs(value).fromNow(),
-  },
-  { field: 'projects', headerName: 'Projects', width: 100, type: 'number' },
-  { field: 'connections', headerName: 'Connections', width: 100, type: 'number' },
+  { field: 'name', headerName: 'Name', flex: 1, minWidth: 200 },
 ];
 
-const getFiltersFromSearchParams = (searchParams: URLSearchParams): AccountViewFilter => {
+const getFiltersFromSearchParams = (searchParams: URLSearchParams): OrganizationViewFilter => {
   return {
-    username: searchParams.get('username'),
-    id: searchParams.get('id'),
+    name: searchParams.get('name'),
+    slug: searchParams.get('slug'),
     email: searchParams.get('email'),
-    project: searchParams.get('project'),
-    domain: searchParams.get('domain'),
-    suspended: searchParams.get('suspended') === 'on',
     page: searchParams.has('page') ? parseInt(searchParams.get('page') as string) : 0,
   };
 };
 
-const isSearchChanged = (oldFilter: AccountViewFilter, newFilter: AccountViewFilter) => {
+const isSearchChanged = (oldFilter: OrganizationViewFilter, newFilter: OrganizationViewFilter) => {
   const { page: page1, ...restA } = oldFilter;
   const { page: page2, ...restB } = newFilter;
-  return !isEqual(restA, restB);
+  return JSON.stringify(restA) !== JSON.stringify(restB);
 };
 
-const Accounts = () => {
+const Organizations = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortModel: GridSortModel = getSortModelFromQuery(searchParams);
   const [filter, setFilter] = useState(() => getFiltersFromSearchParams(searchParams));
@@ -78,7 +71,7 @@ const Accounts = () => {
     filter,
     sort: !!sortModel[0]?.sort ? sortModel[0] : null,
   };
-  const accounts = useAccounts(view, { placeholderData: keepPreviousData });
+  const organizations = useOrganizations(view, { placeholderData: keepPreviousData });
   const navigate = useNavigate();
 
   const onSubmit = (e: SyntheticEvent) => {
@@ -101,14 +94,15 @@ const Accounts = () => {
     setFormData(getFiltersFromSearchParams(newSearchParams));
   };
 
-  if (accounts.isError) {
+  if (organizations.isError) {
     return <Alert severity="error">Load accounts failed.</Alert>;
   }
-  if (accounts.isPending || !accounts.data) {
+  if (organizations.isPending || !organizations.data) {
     return <CircularProgress />;
   }
 
-  const onRowClick: GridEventListener<'rowClick'> = (params) => {
+  const onRowClick: GridEventListener<'rowClick'> = (params, p2, p3) => {
+    console.log('onRowClick', p2, p3);
     navigate(params.row.id);
   };
   const onSortModelChange = (model: GridSortModel, _details: GridCallbackDetails) => {
@@ -131,73 +125,55 @@ const Accounts = () => {
   const onControlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.name !== 'suspended' ? event.target.value : event.target.checked,
+      [event.target.name]: event.target.value,
     });
   };
   return (
     <>
-      <Badge badgeContent={accounts.data?.totalCount} color="primary" max={100000}>
+      <Badge badgeContent={organizations.data?.totalCount} color="primary" max={100000}>
         <Typography variant="h3" component="h1">
-          Accounts
+          Organizations
         </Typography>
         <Divider />
       </Badge>
       <Paper variant="outlined" sx={{ padding: 2 }}>
         <Box component="form" noValidate onSubmit={onSubmit} sx={{ maxWidth: 300 }}>
           <Stack spacing={1}>
-            <TextField
-              name="username"
-              label="Username"
-              variant="outlined"
-              size="small"
-              value={formData.username || ''}
-              onChange={onControlChange}
-            />
-            <TextField
-              name="id"
-              label="Id"
-              variant="outlined"
-              size="small"
-              value={formData.id || ''}
-              onChange={onControlChange}
-            />
-            <TextField
-              name="email"
-              type="email"
-              label="Email"
-              variant="outlined"
-              size="small"
-              value={formData.email || ''}
-              onChange={onControlChange}
-            />
-            <TextField
-              name="project"
-              label="Project"
-              variant="outlined"
-              size="small"
-              value={formData.project || ''}
-              onChange={onControlChange}
-            />
-            <TextField
-              name="domain"
-              label="Backend domain"
-              variant="outlined"
-              size="small"
-              value={formData.domain || ''}
-              onChange={onControlChange}
-            />
-            <FormControlLabel
-              control={<Checkbox name="suspended" checked={formData.suspended} onChange={onControlChange} />}
-              label="Suspended"
-            />
-          </Stack>
-          <Stack direction="row" spacing={2}>
-            <Button variant="contained" type="submit">
-              Search
-            </Button>
-            <Button variant="text" onClick={onReset}>
-              Reset
-            </Button>
+            <Stack spacing={1}>
+              <TextField
+                name="name"
+                label="Name"
+                variant="outlined"
+                size="small"
+                value={formData.name || ''}
+                onChange={onControlChange}
+              />
+              <TextField
+                name="slug"
+                label="Slug"
+                variant="outlined"
+                size="small"
+                value={formData.slug || ''}
+                onChange={onControlChange}
+              />
+              <TextField
+                name="email"
+                type="email"
+                label="Email"
+                variant="outlined"
+                size="small"
+                value={formData.email || ''}
+                onChange={onControlChange}
+              />
+            </Stack>
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" type="submit">
+                Search
+              </Button>
+              <Button variant="text" onClick={onReset}>
+                Reset
+              </Button>
+            </Stack>
           </Stack>
         </Box>
       </Paper>
@@ -205,9 +181,13 @@ const Accounts = () => {
         <DataGrid
           slots={{ pagination: CustomPagination }}
           slotProps={{
-            pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page: filter.page, onPageChange },
+            pagination: {
+              count: Math.ceil(organizations.data.totalCount / PAGE_SIZE),
+              page: filter.page,
+              onPageChange,
+            },
           }}
-          rows={accounts.data.accounts}
+          rows={organizations.data.organizations}
           columns={columns}
           pageSizeOptions={[PAGE_SIZE]}
           disableRowSelectionOnClick
@@ -221,4 +201,4 @@ const Accounts = () => {
   );
 };
 
-export default Accounts;
+export default Organizations;

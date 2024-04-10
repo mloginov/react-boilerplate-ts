@@ -17,6 +17,6 @@ const requestFixture = (): Request => ({
 });
 
 export const fetchRequests = async (): Promise<Request[]> => {
-  await stall(1000);
+  await stall();
   return [...new Array(15)].map(requestFixture);
 };

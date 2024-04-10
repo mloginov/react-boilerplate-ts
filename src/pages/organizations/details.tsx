@@ -1,6 +1,5 @@
 import React, { SyntheticEvent } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useAccountDetails } from '../../features/accounts';
 import { keepPreviousData } from '@tanstack/react-query';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -14,57 +13,48 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import dayjs from 'dayjs';
 import Box from '@mui/material/Box';
 
 import Subscription from './details/subscription';
 import EducationStatus from './details/education-status';
-import Projects from './details/projects';
+import Owners from './details/owners';
 import Details from './details/details';
-import IPs from './details/ips';
 import Badge from '@mui/material/Badge';
+import { useOrganizationDetails } from '../../features/organizations';
 
-const AccountDetails = () => {
+const OrganizationDetails = () => {
   const params = useParams();
-  const accountInfo = useAccountDetails(params.id || '', { placeholderData: keepPreviousData });
+  const organizationInfo = useOrganizationDetails(params.id || '', { placeholderData: keepPreviousData });
   const [searchParams, setSearchParams] = useSearchParams();
   const onTabChange = (_: SyntheticEvent, tab: any) => {
     setSearchParams(new URLSearchParams({ tab }));
   };
-  if (accountInfo.isError) {
-    return <Alert severity="error">Load account data failed.</Alert>;
+  if (organizationInfo.isError) {
+    return <Alert severity="error">Load organization data failed.</Alert>;
   }
-  if (accountInfo.isPending || !accountInfo.data) {
+  if (organizationInfo.isPending || !organizationInfo.data) {
     return <CircularProgress />;
   }
   return (
     <Stack spacing={2}>
       <Stack spacing={2} direction="row">
         <Typography variant="h4" component="h1" sx={{ flex: 1 }}>
-          {accountInfo.data.fullName}
-          <small style={{ color: grey[600], marginLeft: 10, fontSize: '0.7em' }}>{accountInfo.data.userName}</small>
+          {organizationInfo.data.name}
+          <small style={{ color: grey[600], marginLeft: 10, fontSize: '0.7em' }}>{organizationInfo.data.slug}</small>
         </Typography>
         <Stack spacing={2} direction="row" sx={{ alignItems: 'flex-end' }}>
           <Button variant="contained" color="success" sx={{ whiteSpace: 'nowrap' }}>
-            Login as incognito
-          </Button>
-          <Button variant="contained" color="error" sx={{ whiteSpace: 'nowrap' }}>
-            Downgrade single login
-          </Button>
-          <Button variant="contained" color="error" sx={{ whiteSpace: 'nowrap' }}>
-            Suspend
+            Generate invoice
           </Button>
         </Stack>
       </Stack>
       <Divider />
       <Stack spacing={2} direction="row">
-        <Link href={`mailto:${accountInfo.data.email}`} sx={{ flex: 1 }}>
-          {accountInfo.data.email}
+        <Link href={`mailto:${organizationInfo.data.email}`} sx={{ flex: 1 }}>
+          {organizationInfo.data.email}
         </Link>
         <Stack spacing={1}>
-          <Typography variant="body2">Codio id: {accountInfo.data.id}</Typography>
-          <Typography variant="body2">Last login: {dayjs(accountInfo.data.lastLogin).fromNow()}</Typography>
-          <Typography variant="body2">Created at: {dayjs(accountInfo.data.createdAt).fromNow()}</Typography>
+          <Typography variant="body2">Id: {organizationInfo.data.id}</Typography>
         </Stack>
       </Stack>
       <TabContext value={searchParams.get('tab') || '0'}>
@@ -72,16 +62,15 @@ const AccountDetails = () => {
           <TabList onChange={onTabChange}>
             <Tab label="Subscription" value="0" />
             <Tab label="Education Status" value="1" />
+            <Tab label="Details" value="2" />
             <Tab
               label={
-                <Badge badgeContent={accountInfo.data?.projectsCount} color="primary" max={10000}>
-                  Projects
+                <Badge badgeContent={organizationInfo.data.owners.length} color="primary" max={500}>
+                  Owners
                 </Badge>
               }
-              value="2"
+              value="3"
             />
-            <Tab label="Details" value="3" />
-            <Tab label="IPs" value="4" />
           </TabList>
         </Box>
         <TabPanel value="0">
@@ -91,17 +80,14 @@ const AccountDetails = () => {
           <EducationStatus />
         </TabPanel>
         <TabPanel value="2">
-          <Projects accountInfo={accountInfo.data} />
-        </TabPanel>
-        <TabPanel value="3">
           <Details />
         </TabPanel>
-        <TabPanel value="4">
-          <IPs accountInfo={accountInfo.data} />
+        <TabPanel value="3">
+          <Owners owners={organizationInfo.data.owners} />
         </TabPanel>
       </TabContext>
     </Stack>
   );
 };
 
-export default AccountDetails;
+export default OrganizationDetails;

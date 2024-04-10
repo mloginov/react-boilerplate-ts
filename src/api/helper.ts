@@ -12,6 +12,6 @@ export interface ListView {
   sort: ViewSort | null;
 }
 
-export const stall = async (stallTime = 3000): Promise<void> => {
+export const stall = async (stallTime = 200): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, stallTime));
 };

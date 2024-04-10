@@ -32,6 +32,6 @@ const projectFixture = (): Project => {
 
 export const fetchProjects = async (view: ProjectsListView): Promise<Project[]> => {
   console.log('fetchProjects view', view);
-  await stall(1000);
+  await stall();
   return [...new Array(20)].map(projectFixture);
 };

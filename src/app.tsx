@@ -13,6 +13,8 @@ import Landing from './pages/landing';
 import AuthenticationRequired from './pages/auth-required';
 import AccountDetails from './pages/accounts/details';
 import NotFound from './pages/not-found';
+import Organizations from './pages/organizations';
+import OrganizationDetails from './pages/organizations/details';
 
 const theme = createTheme();
 const queryClient = new QueryClient();
@@ -34,6 +36,11 @@ export class App extends React.Component {
                     <Route path="/accounts">
                       <Route path=":id" element={<AccountDetails />} />
                       <Route index element={<Accounts />} />
+                      <Route path={'*'} element={<Navigate to="/not-found" replace />} />
+                    </Route>
+                    <Route path="/organizations">
+                      <Route path=":id" element={<OrganizationDetails />} />
+                      <Route index element={<Organizations />} />
                       <Route path={'*'} element={<Navigate to="/not-found" replace />} />
                     </Route>
                   </Route>
