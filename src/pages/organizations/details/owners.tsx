@@ -1,12 +1,12 @@
 import React from 'react';
 import { DataGrid, GridColDef, GridEventListener, GridToolbar } from '@mui/x-data-grid';
-import { OwnerDetails } from '../../../api/organizations-manager';
+import { OwnerInfo } from '../../../api/organizations-manager';
 import { useNavigate } from 'react-router-dom';
 
-const columns: GridColDef<OwnerDetails>[] = [{ field: 'username', headerName: 'Username', flex: 1 }];
+const columns: GridColDef<OwnerInfo>[] = [{ field: 'username', headerName: 'Username', flex: 1 }];
 
 interface OwnersProps {
-  owners: OwnerDetails[];
+  owners: OwnerInfo[];
 }
 
 const Owners = ({ owners }: OwnersProps) => {

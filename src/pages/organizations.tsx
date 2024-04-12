@@ -19,14 +19,14 @@ import EmailIcon from '@mui/icons-material/Email';
 import { getSortModelFromQuery } from '../components/helpers';
 import CustomPagination from '../components/helpers/custom-grid-pagination';
 import { Link } from '@mui/material';
-import { Organization, OrganizationViewFilter } from '../api/organizations-manager';
+import { OrganizationShort, OrganizationViewFilter } from '../api/organizations-manager';
 import { useOrganizations } from '../features/organizations';
 
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 20;
 
-const columns: GridColDef<Organization>[] = [
+const columns: GridColDef<OrganizationShort>[] = [
   {
     field: 'email',
     headerName: '',

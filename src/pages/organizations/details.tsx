@@ -14,12 +14,12 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import Box from '@mui/material/Box';
+import Badge from '@mui/material/Badge';
 
 import Subscription from './details/subscription';
 import EducationStatus from './details/education-status';
 import Owners from './details/owners';
 import Details from './details/details';
-import Badge from '@mui/material/Badge';
 import { useOrganizationDetails } from '../../features/organizations';
 
 const OrganizationDetails = () => {
@@ -74,7 +74,7 @@ const OrganizationDetails = () => {
           </TabList>
         </Box>
         <TabPanel value="0">
-          <Subscription />
+          <Subscription organizationInfo={organizationInfo.data} />
         </TabPanel>
         <TabPanel value="1">
           <EducationStatus />

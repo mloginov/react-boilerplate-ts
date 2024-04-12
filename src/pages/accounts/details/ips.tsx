@@ -11,9 +11,9 @@ interface IPsProps {
 const IPs = ({ accountInfo }: IPsProps) => {
   return (
     <List dense={true}>
-      {accountInfo.ips.map((ip) => {
+      {accountInfo.ips.map((ip, index) => {
         return (
-          <ListItem divider={true}>
+          <ListItem key={`${ip}_${index}`} divider={true}>
             <ListItemText primary={ip} />
           </ListItem>
         );
