@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
 interface ConfirmProps {
-  open: boolean;
+  open?: boolean;
   onClose: ((result: boolean) => void) | undefined;
   title?: string;
   content?: string;
@@ -15,7 +15,14 @@ interface ConfirmProps {
   noText?: string;
 }
 
-const Confirm = ({ onClose, open, content, yesText = 'Yes', title = 'Are you sure?', noText = 'No' }: ConfirmProps) => {
+const Confirm = ({
+  onClose,
+  open = false,
+  content,
+  yesText = 'Yes',
+  title = 'Are you sure?',
+  noText = 'No',
+}: ConfirmProps) => {
   const closeHandler = (result: boolean) => {
     onClose && onClose(result);
   };

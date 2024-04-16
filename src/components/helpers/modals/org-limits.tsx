@@ -12,12 +12,12 @@ export interface OrgLimitData {
 }
 
 interface OrgLimitsProps {
-  open: boolean;
-  onClose: ((result?: OrgLimitData) => void) | undefined;
-  maxUsers: number;
+  open?: boolean;
+  onClose?: ((result?: OrgLimitData) => void) | undefined;
+  maxUsers?: number;
 }
 
-const OrgLimits = ({ onClose, open, maxUsers }: OrgLimitsProps) => {
+const OrgLimits = ({ onClose, open = false, maxUsers }: OrgLimitsProps) => {
   const [validationError, setValidationError] = React.useState<Record<string, string | null>>({});
   const onCancel = () => {
     onClose && onClose();
