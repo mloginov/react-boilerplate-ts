@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import _ from 'lodash';
 import { useNavigate } from 'react-router-dom';
 
 import { useTheme } from '@mui/material/styles';
@@ -22,40 +21,37 @@ import MonetizationOn from '@mui/icons-material/MonetizationOn';
 import Lightbulb from '@mui/icons-material/Lightbulb';
 
 import { AuthContext } from './auth/auth-context';
-import { useAllRequests } from '../features/requests';
-
-interface RequestsMap {
-  [key: string]: number;
-}
+import { useRequestsCount } from '../features/requests';
+import { RequestType } from '../api/requests-manager';
 
 const educationItems: (MenuItem | MenuDivider | MenuSubheader)[] = [
   {
     title: 'University',
-    requestsKey: 'university',
+    requestsKey: RequestType.UNIVERSITY,
     to: '/education/requests/university',
     styleName: 'nested',
   },
   {
     title: 'Bootcamps',
-    requestsKey: 'bootcamps',
+    requestsKey: RequestType.BOOTCAMPS,
     to: '/education/requests/bootcamps',
     styleName: 'nested',
   },
   {
     title: 'Professional training',
-    requestsKey: 'profTraining',
+    requestsKey: RequestType.PROF_TRAINING,
     to: '/education/requests/prof-training',
     styleName: 'nested',
   },
   {
     title: 'K12',
-    requestsKey: 'k12',
+    requestsKey: RequestType.K12,
     to: '/education/requests/k12',
     styleName: 'nested',
   },
   {
     title: 'Enterprise',
-    requestsKey: 'enterprise',
+    requestsKey: RequestType.ENTERPRISE,
     to: '/education/requests/enterprise',
     styleName: 'nested',
   },
@@ -66,7 +62,7 @@ interface MenuItem {
   to?: string;
   icon?: string | React.JSX.Element | React.JSX.Element[];
   group?: boolean;
-  requestsKey?: string;
+  requestsKey?: RequestType | 'total';
   styleName?: string;
   items?: (MenuItem | MenuDivider | MenuSubheader)[];
 }
@@ -152,14 +148,7 @@ const Navigation = () => {
       <ListItemText primary="Login" />
     </ListItemButton>
   );
-  const requests = useAllRequests({ enabled: isAuth });
-  let requestsCountMap: RequestsMap | null = null;
-
-  if (requests.data) {
-    const requestsByType = _.groupBy(requests.data, 'type');
-    requestsCountMap = _.mapValues(requestsByType, (values) => values.length);
-    requestsCountMap.total = requests.data.length;
-  }
+  const requestsCount = useRequestsCount({ enabled: isAuth });
 
   const renderMenuItems = (items: (MenuItem | MenuDivider | MenuSubheader)[], parentKey = '') => {
     const elements = items.map((item, index) => {
@@ -186,13 +175,9 @@ const Navigation = () => {
       const itemText = <ListItemText primary={menuItem.title} />;
       let listTextEl = itemText;
       if (menuItem.requestsKey) {
+        const count = requestsCount.data ? requestsCount.data[menuItem.requestsKey] : undefined;
         listTextEl = (
-          <Badge
-            badgeContent={requestsCountMap ? requestsCountMap[menuItem.requestsKey] : ''}
-            invisible={!requestsCountMap || !requestsCountMap[menuItem.requestsKey]}
-            color="primary"
-            sx={styles.badge}
-          >
+          <Badge badgeContent={count} invisible={!count} color="primary" sx={styles.badge}>
             {itemText}
           </Badge>
         );

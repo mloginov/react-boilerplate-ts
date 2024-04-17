@@ -1,22 +1,67 @@
 import { faker } from '@faker-js/faker';
 
 import { stall } from './helper';
+import { RequestsView } from '../features/requests';
 
-const types = ['university', 'bootcamps', 'profTraining', 'k12', 'enterprise'];
+export enum RequestType {
+  UNIVERSITY = 'university',
+  BOOTCAMPS = 'bootcamps',
+  PROF_TRAINING = 'profTraining',
+  K12 = 'k12',
+  ENTERPRISE = 'enterprise',
+}
+
+export enum RequestState {
+  REQUEST = 'request',
+  APPROVED = 'approved',
+  MORE_INFO = 'more_info',
+  DENIED = 'denied',
+}
+const requestStateArr = [RequestState.APPROVED, RequestState.REQUEST, RequestState.DENIED, RequestState.MORE_INFO];
+
+const typesArr = [
+  RequestType.UNIVERSITY,
+  RequestType.BOOTCAMPS,
+  RequestType.PROF_TRAINING,
+  RequestType.K12,
+  RequestType.ENTERPRISE,
+];
 
 export interface Request {
   id: string;
-  name: string;
-  type: string;
+  orgName: string;
+  userName: string;
+  type: RequestType;
+  email: string;
+  state: RequestState;
 }
 
 const requestFixture = (): Request => ({
   id: faker.string.uuid(),
-  name: `${faker.location.city()} Request`,
-  type: faker.helpers.arrayElement(types),
+  orgName: faker.company.name(),
+  userName: faker.person.fullName(),
+  email: faker.internet.email(),
+  type: faker.helpers.arrayElement(typesArr),
+  state: faker.helpers.arrayElement(requestStateArr),
 });
 
-export const fetchRequests = async (): Promise<Request[]> => {
+const requestsCountFixture = (): Record<string, number> => {
+  return {
+    [RequestType.UNIVERSITY]: faker.number.int({ max: 100 }),
+    [RequestType.BOOTCAMPS]: faker.number.int({ max: 100 }),
+    [RequestType.PROF_TRAINING]: faker.number.int({ max: 100 }),
+    [RequestType.K12]: faker.number.int({ max: 100 }),
+    [RequestType.ENTERPRISE]: faker.number.int({ max: 100 }),
+  };
+};
+
+export const fetchRequestsCount = async (): Promise<Record<string, number>> => {
   await stall();
-  return [...new Array(15)].map(requestFixture);
+  return requestsCountFixture();
+};
+
+export const fetchRequests = async (view: RequestsView): Promise<Request[]> => {
+  console.log('fetchRequests', view);
+  await stall();
+  return [...new Array(100)].map(requestFixture);
 };
