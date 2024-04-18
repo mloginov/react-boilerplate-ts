@@ -5,11 +5,12 @@ import TabList from '@mui/lab/TabList';
 import Tab from '@mui/material/Tab';
 import Badge from '@mui/material/Badge';
 import TabPanel from '@mui/lab/TabPanel';
-import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridEventListener, GridRenderCellParams } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
 import { Request, RequestState } from '../../api/requests-manager';
+import { useNavigate } from 'react-router-dom';
 
 interface RequestsTabsProps {
   requests: Request[];
@@ -24,9 +25,13 @@ const baseColumns: GridColDef<Request>[] = [
     flex: 1,
   },
   { field: 'userName', headerName: 'User', flex: 1 },
-  { field: 'type', headerName: 'Type', width: 100 },
   { field: 'email', headerName: 'Email', width: 200 },
-  { field: 'createdAt', headerName: 'Requested time', width: 200 },
+  {
+    field: 'createdAt',
+    headerName: 'Requested time',
+    width: 170,
+    renderCell: (params) => params.value.toLocaleString(),
+  },
 ];
 
 enum RequestAction {
@@ -83,7 +88,14 @@ const getAdditionalColumns = (state: RequestState, onAction: (action: RequestAct
         },
       ];
     case RequestState.APPROVED:
-      return [{ field: 'demoAt', headerName: 'Demo time', width: 200 }];
+      return [
+        {
+          field: 'demoAt',
+          headerName: 'Demo time',
+          width: 170,
+          renderCell: (params: GridRenderCellParams<any, boolean>) => params.value?.toLocaleString(),
+        },
+      ];
     case RequestState.REQUEST:
       return [];
   }
@@ -97,27 +109,28 @@ const styles = {
   gridBase: {
     '& .MuiDataGrid-cell': { alignContent: 'center' },
   },
-  gridRequests: {
+  gridApproved: {
     '& .MuiDataGrid-row': { cursor: 'pointer' },
   },
 };
 
 const RequestsTabs = ({ requests, tab, onTabChange }: RequestsTabsProps) => {
   const requestsCount = requests.filter((request) => request.state === RequestState.REQUEST).length || 0;
+  const navigate = useNavigate();
 
   const onAction = (action: RequestAction) => {
     console.log('onAction', action);
   };
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
     console.log('onRowClick', params);
-    if (params.row.state === RequestState.REQUEST) {
-      // todo show request detailed info
+    if (params.row.state === RequestState.APPROVED) {
+      navigate(params.row.id);
     }
   };
 
   const getRequestsGrid = (state: RequestState) => {
     const data = requests.filter((request) => request.state === state);
-    const sx = state === RequestState.REQUEST ? { ...styles.gridBase, ...styles.gridRequests } : styles.gridBase;
+    const sx = state === RequestState.APPROVED ? { ...styles.gridBase, ...styles.gridApproved } : styles.gridBase;
     return (
       <DataGrid
         initialState={{

@@ -20,6 +20,7 @@ import Organizations from './pages/organizations';
 import OrganizationDetails from './pages/organizations/details';
 import Requests from './pages/education/requests';
 import AuthenticationRequired from './pages/auth-required';
+import RequestDetails from './pages/requests/details';
 
 const theme = createTheme();
 const queryClient = new QueryClient();
@@ -51,7 +52,10 @@ export class App extends React.Component {
                       </Route>
                       <Route path="/education">
                         <Route path="requests">
-                          <Route path="university" element={<Requests type={RequestType.UNIVERSITY} />} />
+                          <Route path="university">
+                            <Route index element={<Requests type={RequestType.UNIVERSITY} />} />
+                            <Route path=":id" element={<RequestDetails />} />
+                          </Route>
                           <Route path="bootcamps" element={<Requests type={RequestType.BOOTCAMPS} />} />
                           <Route path="prof-training" element={<Requests type={RequestType.PROF_TRAINING} />} />
                           <Route path="k12" element={<Requests type={RequestType.K12} />} />

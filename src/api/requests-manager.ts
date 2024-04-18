@@ -19,14 +19,6 @@ export enum RequestState {
 }
 const requestStateArr = [RequestState.APPROVED, RequestState.REQUEST, RequestState.DENIED, RequestState.MORE_INFO];
 
-const typesArr = [
-  RequestType.UNIVERSITY,
-  RequestType.BOOTCAMPS,
-  RequestType.PROF_TRAINING,
-  RequestType.K12,
-  RequestType.ENTERPRISE,
-];
-
 export interface Request {
   id: string;
   orgName: string;
@@ -34,16 +26,23 @@ export interface Request {
   type: RequestType;
   email: string;
   state: RequestState;
+  createdAt: Date;
+  demoAt?: Date;
 }
 
-const requestFixture = (): Request => ({
-  id: faker.string.uuid(),
-  orgName: faker.company.name(),
-  userName: faker.person.fullName(),
-  email: faker.internet.email(),
-  type: faker.helpers.arrayElement(typesArr),
-  state: faker.helpers.arrayElement(requestStateArr),
-});
+const requestFixture = (type: RequestType): Request => {
+  const state = faker.helpers.arrayElement(requestStateArr);
+  return {
+    id: faker.string.uuid(),
+    orgName: faker.company.name(),
+    userName: faker.person.fullName(),
+    email: faker.internet.email(),
+    type: type,
+    state,
+    createdAt: faker.date.recent(),
+    demoAt: state === RequestState.APPROVED ? faker.date.soon() : undefined,
+  };
+};
 
 const requestsCountFixture = (): Record<string, number> => {
   return {
@@ -63,5 +62,5 @@ export const fetchRequestsCount = async (): Promise<Record<string, number>> => {
 export const fetchRequests = async (view: RequestsView): Promise<Request[]> => {
   console.log('fetchRequests', view);
   await stall();
-  return [...new Array(100)].map(requestFixture);
+  return [...new Array(100)].map((_) => requestFixture(view.type));
 };
