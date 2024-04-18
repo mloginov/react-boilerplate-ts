@@ -10,24 +10,26 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import RequestsTabs from '../requests/tabs';
+import Typography from '@mui/material/Typography';
+import { grey } from '@mui/material/colors';
+import RequestsSearchResult from '../requests/search-result';
 
 interface RequestsProps {
   type: RequestType;
 }
 
 const Requests = ({ type }: RequestsProps) => {
-  const requests = useRequests({ type });
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchSettings, setSearchSettings] = React.useState({ value: '', active: false });
+
+  const requests = useRequests({
+    type: searchSettings.active ? undefined : type,
+    search: searchSettings.active ? searchSettings.value : undefined,
+  });
+
   const onTabChange = (tab: string) => {
     setSearchParams(new URLSearchParams({ tab }));
   };
-  if (requests.isError) {
-    return <Alert severity="error">Load requests data failed.</Alert>;
-  }
-  if (requests.isPending || !requests.data) {
-    return <CircularProgress />;
-  }
 
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -46,8 +48,33 @@ const Requests = ({ type }: RequestsProps) => {
     setSearchSettings({ ...searchSettings, value: event.target.value });
   };
 
+  const getContent = () => {
+    if (requests.isError) {
+      return <Alert severity="error">Load requests data failed.</Alert>;
+    }
+    if (requests.isPending || !requests.data) {
+      return <CircularProgress />;
+    }
+    if (searchSettings.active && searchSettings.value) {
+      return <RequestsSearchResult searchText={searchSettings.value} requests={requests.data} />;
+    }
+    return (
+      <RequestsTabs
+        requests={requests.data}
+        tab={searchParams.get('tab') || RequestState.REQUEST}
+        onTabChange={onTabChange}
+      />
+    );
+  };
+
   return (
     <Stack spacing={2}>
+      <Typography variant="h4" component="h1" sx={{ flex: 1 }}>
+        Education
+        <small style={{ color: grey[600], marginLeft: 10, fontSize: '0.7em' }}>
+          Trial requests for {type.toUpperCase()}
+        </small>
+      </Typography>
       <Paper variant="outlined" sx={{ padding: 2 }}>
         <Box component="form" noValidate onSubmit={onSubmit} sx={{ maxWidth: 600 }}>
           <Stack spacing={1} direction="row">
@@ -68,11 +95,7 @@ const Requests = ({ type }: RequestsProps) => {
           </Stack>
         </Box>
       </Paper>
-      <RequestsTabs
-        requests={requests.data}
-        tab={searchParams.get('tab') || RequestState.REQUEST}
-        onTabChange={onTabChange}
-      />
+      {getContent()}
     </Stack>
   );
 };

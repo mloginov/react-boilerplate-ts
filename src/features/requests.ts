@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { RequestType } from '../api/requests-manager';
 
 export interface RequestsView {
-  type: RequestType;
+  type?: RequestType;
+  search?: string;
 }
 
 const requestsKeys = {

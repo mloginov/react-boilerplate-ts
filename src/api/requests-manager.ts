@@ -10,6 +10,13 @@ export enum RequestType {
   K12 = 'k12',
   ENTERPRISE = 'enterprise',
 }
+const typesArr = [
+  RequestType.UNIVERSITY,
+  RequestType.BOOTCAMPS,
+  RequestType.PROF_TRAINING,
+  RequestType.K12,
+  RequestType.ENTERPRISE,
+];
 
 export enum RequestState {
   REQUEST = 'request',
@@ -30,14 +37,14 @@ export interface Request {
   demoAt?: Date;
 }
 
-const requestFixture = (type: RequestType): Request => {
+const requestFixture = (type?: RequestType): Request => {
   const state = faker.helpers.arrayElement(requestStateArr);
   return {
     id: faker.string.uuid(),
     orgName: faker.company.name(),
     userName: faker.person.fullName(),
     email: faker.internet.email(),
-    type: type,
+    type: type || faker.helpers.arrayElement(typesArr),
     state,
     createdAt: faker.date.recent(),
     demoAt: state === RequestState.APPROVED ? faker.date.soon() : undefined,

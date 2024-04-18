@@ -5,12 +5,9 @@ import TabList from '@mui/lab/TabList';
 import Tab from '@mui/material/Tab';
 import Badge from '@mui/material/Badge';
 import TabPanel from '@mui/lab/TabPanel';
-import { DataGrid, GridColDef, GridEventListener, GridRenderCellParams } from '@mui/x-data-grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 
 import { Request, RequestState } from '../../api/requests-manager';
-import { useNavigate } from 'react-router-dom';
+import RequestsGrid from './grid';
 
 interface RequestsTabsProps {
   requests: Request[];
@@ -18,131 +15,14 @@ interface RequestsTabsProps {
   onTabChange: (tab: string) => void;
 }
 
-const baseColumns: GridColDef<Request>[] = [
-  {
-    field: 'orgName',
-    headerName: 'Org Name',
-    flex: 1,
-  },
-  { field: 'userName', headerName: 'User', flex: 1 },
-  { field: 'email', headerName: 'Email', width: 200 },
-  {
-    field: 'createdAt',
-    headerName: 'Requested time',
-    width: 170,
-    renderCell: (params) => params.value.toLocaleString(),
-  },
-];
-
-enum RequestAction {
-  APPROVE,
-  DENY,
-  MOVE_TO_PENDING,
-}
-
-const getAdditionalColumns = (state: RequestState, onAction: (action: RequestAction) => void) => {
-  switch (state) {
-    case RequestState.MORE_INFO:
-      return [
-        {
-          field: 'state',
-          headerName: '',
-          width: 200,
-          renderCell: () => {
-            return (
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => onAction(RequestAction.APPROVE)}
-                  color="success"
-                >
-                  Approve
-                </Button>
-                <Button variant="contained" size="small" onClick={() => onAction(RequestAction.DENY)} color="error">
-                  Deny
-                </Button>
-              </Stack>
-            );
-          },
-        },
-      ];
-    case RequestState.DENIED:
-      return [
-        {
-          field: 'state',
-          headerName: '',
-          width: 200,
-          renderCell: () => {
-            return (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => onAction(RequestAction.MOVE_TO_PENDING)}
-                color="info"
-              >
-                Move to Pending
-              </Button>
-            );
-          },
-        },
-      ];
-    case RequestState.APPROVED:
-      return [
-        {
-          field: 'demoAt',
-          headerName: 'Demo time',
-          width: 170,
-          renderCell: (params: GridRenderCellParams<any, boolean>) => params.value?.toLocaleString(),
-        },
-      ];
-    case RequestState.REQUEST:
-      return [];
-  }
-};
-
-const getColumns = (state: RequestState, onAction: (action: RequestAction) => void) => {
-  return [...baseColumns, ...getAdditionalColumns(state, onAction)];
-};
-
-const styles = {
-  gridBase: {
-    '& .MuiDataGrid-cell': { alignContent: 'center' },
-  },
-  gridApproved: {
-    '& .MuiDataGrid-row': { cursor: 'pointer' },
-  },
-};
-
 const RequestsTabs = ({ requests, tab, onTabChange }: RequestsTabsProps) => {
   const requestsCount = requests.filter((request) => request.state === RequestState.REQUEST).length || 0;
-  const navigate = useNavigate();
-
-  const onAction = (action: RequestAction) => {
-    console.log('onAction', action);
-  };
-  const onRowClick: GridEventListener<'rowClick'> = (params) => {
-    console.log('onRowClick', params);
-    if (params.row.state === RequestState.APPROVED) {
-      navigate(params.row.id);
-    }
-  };
 
   const getRequestsGrid = (state: RequestState) => {
     const data = requests.filter((request) => request.state === state);
-    const sx = state === RequestState.APPROVED ? { ...styles.gridBase, ...styles.gridApproved } : styles.gridBase;
-    return (
-      <DataGrid
-        initialState={{
-          pagination: { paginationModel: { pageSize: 25 } },
-        }}
-        rows={data}
-        columns={getColumns(state, onAction)}
-        disableRowSelectionOnClick
-        onRowClick={onRowClick}
-        sx={sx}
-      ></DataGrid>
-    );
+    const showActionsColumn = state === RequestState.MORE_INFO || state === RequestState.DENIED;
+    const showDemoColumn = state === RequestState.APPROVED;
+    return <RequestsGrid requests={data} showActionsColumn={showActionsColumn} showDemoColumn={showDemoColumn} />;
   };
   return (
     <TabContext value={tab}>
