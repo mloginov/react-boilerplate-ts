@@ -1,7 +1,8 @@
 import React from 'react';
-import { DataGrid, GridColDef, GridEventListener, GridToolbar } from '@mui/x-data-grid';
+import { GridColDef, GridEventListener, GridToolbar } from '@mui/x-data-grid';
 import { OwnerInfo } from '../../../api/organizations-manager';
 import { useNavigate } from 'react-router-dom';
+import StripedDataGrid from '../../../components/helpers/striped-data-grid';
 
 const columns: GridColDef<OwnerInfo>[] = [{ field: 'username', headerName: 'Username', flex: 1 }];
 
@@ -15,7 +16,7 @@ const Owners = ({ owners }: OwnersProps) => {
     navigate(`/accounts/${params.row.id}`);
   };
   return (
-    <DataGrid
+    <StripedDataGrid
       rows={owners}
       columns={columns}
       disableColumnFilter
@@ -34,7 +35,7 @@ const Owners = ({ owners }: OwnersProps) => {
       }}
       onRowClick={onRowClick}
       sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-    ></DataGrid>
+    ></StripedDataGrid>
   );
 };
 

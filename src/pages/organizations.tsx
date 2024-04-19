@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
-import { DataGrid, GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
+import { GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -21,6 +21,7 @@ import CustomPagination from '../components/helpers/custom-grid-pagination';
 import { Link } from '@mui/material';
 import { OrganizationShort, OrganizationViewFilter } from '../api/organizations-manager';
 import { useOrganizations } from '../features/organizations';
+import StripedDataGrid from '../components/helpers/striped-data-grid';
 
 dayjs.extend(relativeTime);
 
@@ -178,7 +179,7 @@ const Organizations = () => {
         </Box>
       </Paper>
       <Box sx={{ marginTop: 1 }}>
-        <DataGrid
+        <StripedDataGrid
           slots={{ pagination: CustomPagination }}
           slotProps={{
             pagination: {
@@ -195,7 +196,7 @@ const Organizations = () => {
           sortModel={sortModel}
           onSortModelChange={onSortModelChange}
           sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-        ></DataGrid>
+        ></StripedDataGrid>
       </Box>
     </>
   );

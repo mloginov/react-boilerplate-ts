@@ -8,7 +8,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import {
-  DataGrid,
   GridCallbackDetails,
   GridColDef,
   GridEventListener,
@@ -25,6 +24,7 @@ import { AccountDetails } from '../../../api/accounts-manager';
 import { getSortModelFromQuery } from '../../../components/helpers';
 import { useProjects } from '../../../features/projects';
 import { Project, ProjectsListView, ProjectsViewFilter } from '../../../api/projects-manager';
+import StripedDataGrid from '../../../components/helpers/striped-data-grid';
 
 const PAGE_SIZE = 20;
 
@@ -163,7 +163,7 @@ const Projects = ({ accountInfo }: ProjectsProps) => {
           </Stack>
         </Box>
       </Paper>
-      <DataGrid
+      <StripedDataGrid
         slots={{ pagination: CustomPagination }}
         slotProps={{
           pagination: { count: Math.ceil(accountInfo.projectsCount / PAGE_SIZE), page: filter.page, onPageChange },
@@ -176,7 +176,7 @@ const Projects = ({ accountInfo }: ProjectsProps) => {
         sortModel={sortModel}
         onSortModelChange={onSortModelChange}
         sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-      ></DataGrid>
+      ></StripedDataGrid>
     </Stack>
   );
 };

@@ -1,9 +1,10 @@
 import React from 'react';
-import { DataGrid, GridColDef, GridEventListener, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridEventListener, GridRenderCellParams } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 
 import { getActionButtonsByState, RequestAction } from './helpers';
 import { Request, RequestState } from '../../api/requests-manager';
+import StripedDataGrid from '../../components/helpers/striped-data-grid';
 
 const baseColumns: GridColDef<Request>[] = [
   {
@@ -69,10 +70,8 @@ const RequestsGrid = ({ requests, showActionsColumn, showDemoColumn }: RequestsG
     }
   };
 
-  // const sx = state === RequestState.APPROVED ? { ...styles.gridBase, ...styles.gridApproved } : styles.gridBase;
-
   return (
-    <DataGrid
+    <StripedDataGrid
       initialState={{
         pagination: { paginationModel: { pageSize: 25 } },
       }}
@@ -81,8 +80,7 @@ const RequestsGrid = ({ requests, showActionsColumn, showDemoColumn }: RequestsG
       disableRowSelectionOnClick
       onRowClick={onRowClick}
       sx={styles}
-      getRowClassName={(params) => (params.row.state === RequestState.APPROVED ? `dataGridRow--clickable` : '')}
-    ></DataGrid>
+    />
   );
 };
 

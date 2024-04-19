@@ -12,7 +12,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
-import { DataGrid, GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
+import { GridCallbackDetails, GridColDef, GridEventListener, GridSortModel } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -22,6 +22,7 @@ import { useAccounts } from '../features/accounts';
 import { Account, AccountViewFilter } from '../api/accounts-manager';
 import { getSortModelFromQuery } from '../components/helpers';
 import CustomPagination from '../components/helpers/custom-grid-pagination';
+import StripedDataGrid from '../components/helpers/striped-data-grid';
 
 dayjs.extend(relativeTime);
 
@@ -202,7 +203,7 @@ const Accounts = () => {
         </Box>
       </Paper>
       <Box sx={{ marginTop: 1 }}>
-        <DataGrid
+        <StripedDataGrid
           slots={{ pagination: CustomPagination }}
           slotProps={{
             pagination: { count: Math.ceil(accounts.data.totalCount / PAGE_SIZE), page: filter.page, onPageChange },
@@ -215,7 +216,7 @@ const Accounts = () => {
           sortModel={sortModel}
           onSortModelChange={onSortModelChange}
           sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-        ></DataGrid>
+        ></StripedDataGrid>
       </Box>
     </>
   );

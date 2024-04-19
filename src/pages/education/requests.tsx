@@ -1,7 +1,5 @@
 import React, { SyntheticEvent } from 'react';
-import { RequestState, RequestType } from '../../api/requests-manager';
 import { useSearchParams } from 'react-router-dom';
-import { useRequests } from '../../features/requests';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
@@ -9,9 +7,12 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import RequestsTabs from '../requests/tabs';
 import Typography from '@mui/material/Typography';
 import { grey } from '@mui/material/colors';
+
+import { RequestState, RequestType } from '../../api/requests-manager';
+import { useRequests } from '../../features/requests';
+import RequestsTabs from '../requests/tabs';
 import RequestsSearchResult from '../requests/search-result';
 
 interface RequestsProps {
