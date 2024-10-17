@@ -1,9 +1,13 @@
-const path = require('path');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import HtmlWebPackPlugin from 'html-webpack-plugin';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default {
   entry: {
-    app: ['./src/app.tsx'],
+    app: ['./src/index.tsx'],
     vendor: ['react', 'react-dom'],
   },
   output: {
@@ -20,7 +24,11 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
-      }
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
 
