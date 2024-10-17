@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Main } from './main';
 
-export class App {
+export class Index {
   constructor() {
     this.render();
   }
@@ -14,4 +14,4 @@ export class App {
   }
 }
 
-new App();
+new Index();
